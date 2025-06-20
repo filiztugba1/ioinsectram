@@ -1,0 +1,831 @@
+<?php
+User::model()->login();
+$ax= User::model()->userobjecty('');
+
+	if($ax->firmid>0)
+	{
+		if($ax->branchid>0)
+		{
+			if($ax->clientid>0)
+			{
+				//buraya ekleme yapam�cak client ve clientbranch
+			}
+			else
+			{
+				$where="branchid=".$ax->branchid;
+			}
+		}
+		else
+		{
+			$where="firmid=".$ax->firmid;
+		}
+	}
+	else
+	{
+		$where="";
+	}
+
+
+
+$routes=Route::model()->findAll(array('order'=>'name ASC','condition'=>$where));
+
+
+
+
+						?>
+
+
+<?php if (Yii::app()->user->checkAccess('routeidentification.view')){ ?>
+
+<!-- Sayfada neredeyiz -->
+<?=User::model()->geturl('Route','',0,'route');?>
+<?php if (Yii::app()->user->checkAccess('routeidentification.create')){ ?>
+<div class="row" id="createpage" >
+	<div class="col-xl-12 col-lg-12 col-md-12">
+
+			<div class="card">
+			     <div class="card-header">
+						 <div class="row" style="padding-bottom: 10px;border-bottom: 1px solid #f8f8f9;">
+							 <div class="col-md-6">
+								  <h4  class="card-title"><?=t('New Route Create');?></h4>
+									</div>
+									 <div class="col-md-6">
+								<button id="cancel" class="btn btn-danger btn-xs" style="float:right" type="submit"><i class="fa fa-times"></i></button>
+								</div>
+						</div>
+					 </div>
+
+				<form id="user-form" action="/route/create" method="post">
+				<div class="card-content">
+					<div class="card-body">
+
+					<div class="row">
+
+
+					<?php if($ax->firmid==0){?>
+						<div class="col-xl-4 col-lg-4 col-md-4 mb-1">
+							<label for="basicSelect"><?=t('Firm');?></label>
+							<fieldset class="form-group">
+								<select class="select2" style="width:100%" id="firm" name="Route[firmid]" onchange="myfirm()" requred>
+									<option value="0"><?=t('Please Chose');?></option>
+									<?
+									$firm=Firm::model()->findall(array('condition'=>'parentid=0'));
+									 foreach($firm as $firmx){?>
+									<option <?php if($firmx->id==$ax->firmid){echo "selected";}?> value="<?=$firmx->id;?>"><?=$firmx->name;?></option>
+									 <?php }?>
+								</select>
+							</fieldset>
+						</div>
+						<?php }else{?>
+							<input type="hidden" class="form-control" id="firm" name="Route[firmid]" value="<?=$ax->firmid;?>" requred>
+						<?php }?>
+
+						<?php if($ax->branchid==0){?>
+						<div class="col-xl-4 col-lg-4 col-md-4 mb-1">
+						<label for="basicSelect"><?=t('Branch');?></label>
+							<fieldset class="form-group">
+								<select class="select2" style="width:100%" id="branch" name="Route[branchid]" onchange="mybranch()" disabled requred>
+									<option value="0"><?=t('Please Chose');?></option>
+
+									<?
+									if($ax->firmid!=0){
+									$branch=Firm::model()->findall(array('condition'=>'parentid='.$ax->firmid));
+									 foreach($branch as $branchx){?>
+									<option <?php if($branchx->id==$ax->branchid){echo "selected";}?> value="<?=$branchx->id;?>"><?=$branchx->name;?></option>
+									<?php }}?>
+								</select>
+							</fieldset>
+						</div>
+						<?php }else{?>
+							<input type="hidden" class="form-control" id="branch" name="Route[branchid]" value="<?=$ax->branchid;?>" requred>
+						<?php }?>
+
+					<div class="col-xl-4 col-lg-4 col-md-4 mb-1">
+						<label for="basicSelect"><?=t('Route Name');?></label>
+                        <fieldset class="form-group">
+                          <input type="text" class="form-control" id="basicInput" placeholder="<?=t('Route Name');?>" name="Route[name]">
+                        </fieldset>
+                    </div>
+
+
+
+
+					<div class="col-xl-12 col-lg-12 col-md-12 mb-1">
+						<label for="basicSelect"><?=t('Route Client');?></label>
+                        <fieldset class="form-group">
+                          <select class="select2-placeholder-multiple form-control" multiple="multiple" id="route" style="width:100%;" name="Route[routeclient][]">
+								<option value="0"><?=t("Select");?></option>
+								<?
+								$client=Client::model()->findall(array('condition'=>'isdelete=0 and parentid=0 and firmid='.$ax->branchid));
+
+									foreach($client as $clientx)
+										{$clientbranchs=Client::model()->findAll(array('condition'=>'isdelete=0 and parentid='.$clientx->id));
+
+										if(count($clientbranchs)>0){?>
+											<optgroup label="<?=$clientx->name;?>">
+												<?
+
+													foreach($clientbranchs as $clientbranch)
+													{?>
+														<option <?php if($clientbranch->id==$ax->clientid){echo "selected";}?> value="<?=$clientbranch->id;?>"><?=$clientbranch->name;?></option>
+													<?php }?>
+											</optgroup>
+											<?php }?>
+								<?php }
+									$tclient=Client::model()->findAll(array('order'=>'name ASC','condition'=>'isdelete=0 and firmid='.$ax->branchid.' and mainclientid!=0 and mainfirmid!=firmid group by mainclientid'));
+									foreach($tclient as $tclientx)
+									{
+
+										$tclients=Client::model()->findAll(array('condition'=>'isdelete=0 and id='.$tclientx->mainclientid));
+										foreach($tclients as $tclientsx)
+										{?>
+											<optgroup label="<?=$tclientsx->name;?>">
+											<?$tclientbranchs=Client::model()->findAll(array('condition'=>'isdelete=0 and parentid='.$tclientsx->id.' and firmid='.$ax->branchid));
+											foreach($tclientbranchs as $tclientbranchsx)
+											{?>
+												<option <?php if($tclientbranchsx->id==$ax->clientid){echo "selected";}?>  value="<?=$tclientbranchsx->id;?>"><?=$tclientsx->name;?> -> <?=$tclientbranchsx->name;?></option>
+											<?php }?>
+											</optgroup>
+										<?php }
+
+									}?>
+							  </select>
+                        </fieldset>
+                    </div>
+
+
+
+					  	<div class="col-xl-3 col-lg-3 col-md-3 mb-1">
+						<label for="basicSelect" style="margin-top:15px"></label>
+                        <fieldset class="form-group">
+                        <div class="input-group-append" id="button-addon2">
+									<button class="btn btn-primary block-page" type="submit"><?=t('Create');?></button>
+								</div>
+                        </fieldset>
+                    </div>
+					  </div>
+
+
+
+					</div>
+				</div>
+			</form>
+			</div>
+
+	</div><!-- form -->
+	</div>
+<?php }?>
+
+
+
+
+
+<!-- HTML5 export buttons table -->
+
+        <section id="html5">
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+					<div class="row" style="border-bottom: 1px solid #e3ebf3;">
+					   <div class="col-xl-8 col-lg-8 col-md-8 mb-1">
+						 <h4 class="card-title"><?=t('ROUTE LIST');?></h4>
+						</div>
+
+						<?php if (Yii::app()->user->checkAccess('routeidentification.create')){ ?>
+							<div class="col-xl-4 col-lg-4 col-md-4 mb-1">
+								<div class="input-group-append" id="button-addon2" style="float: right; text-align: right;">
+									<button class="btn btn-info" id="createbutton" type="submit"><?=t('Route Registration');?> <i class="fa fa-plus"></i></button>
+								</div>
+
+						</div>
+						<?php }?>
+
+					</div>
+                </div>
+
+                <div class="card-content collapse show">
+                  <div class="card-body card-dashboard">
+
+                      <table class="table table-striped table-bordered dataex-html5-export">
+                        <thead>
+                          <tr>
+						  <th style='width:1px;'><input type="checkbox" name="select_all" value="1" id="select_all"></th>
+                             <th><?=t('ROUTE NAME');?></th>
+							   <?php if($ax->firmid==0){?>
+								<th><?=t('FIRM');?></th>
+								<?php }?>
+
+								<?php if($ax->branchid==0){?>
+								<th><?=t('BRANCH');?></th>
+								<?php }?>
+							 <th><?=t('PROCESS');?></th>
+
+
+                          </tr>
+                        </thead>
+                        <tbody>
+             			<?php foreach($routes as $route):?>
+                                <tr>
+
+								<td><input type="checkbox" name="Route[id][]" class='sec' value="<?=$route->id;?>"></td>
+                                    <td><?=$route->name;?></td>
+										<?php if($ax->firmid==0){?>
+									<td><?=Firm::model()->find(array('condition'=>'id='.$route->firmid))->name;?></td>
+									<?php }?>
+
+									<?php if($ax->branchid==0){?>
+									<td><?=Firm::model()->find(array('condition'=>'id='.$route->branchid))->name;?></td>
+									<?php }?>
+
+
+
+								<?$bolclient=explode(",", $route->routetb);
+								?>
+									<!--
+									<td>
+										<?
+										for($i=0;$i<count($bolclient);$i++)
+											{
+											$tbclient=Client::model()->find(array(
+										   'select'=>'name',
+										   'condition'=>'id='.$bolclient[$i],
+											));
+											?>
+												<button class="btn btn-info btn-sm" id="createbutton" type="submit"><?=$tbclient->name;?></button>
+											<?
+
+											}
+										?>
+									</td>
+									-->
+
+									<td>
+
+									<?php if (Yii::app()->user->checkAccess('routeidentification.update')){ ?>
+									<a  class="btn btn-warning btn-sm" onclick="openmodal(this)"
+									 data-id="<?=$route->id;?>"
+									 data-name="<?=$route->name;?>"
+									 data-branchid="<?=$route->branchid;?>"
+									 data-routeclient="<?=implode(',',$bolclient)?>,"
+									  data-toggle="tooltip" data-placement="top" title="" data-original-title="Update"
+								  ><i style="color:#fff;" class="fa fa-edit"></i></a>
+								  <?php }?>
+
+
+							<?php if (Yii::app()->user->checkAccess('routeidentification.delete')){ ?>
+							<a class="btn btn-danger btn-sm" onclick="openmodalsil(this)"
+							data-id="<?=$route->id;?>"  data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i style="color:#fff;" class="fa fa-trash"></i></a>
+
+							<?php }?>
+							</td>
+
+
+
+                                </tr>
+
+								<?php endforeach;?>
+
+                        </tbody>
+                        <tfoot>
+                          <tr>
+
+						    <th style='width:1px;'>
+							<?php if (Yii::app()->user->checkAccess('routeidentification.delete')){ ?>
+								<div class="input-group-append" id="button-addon2" style="float: right; text-align: right;">
+									<button onclick='deleteall()' class="btn btn-danger btn-sm" type="submit" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete selected"><i class="fa fa-trash"></i></button>
+								</div>
+								<?php }?>
+							</th>
+
+
+							<th><?=t('ROUTE NAME');?></th>
+							  <?php if($ax->firmid==0){?>
+								<th><?=t('FIRM');?></th>
+								<?php }?>
+
+								<?php if($ax->branchid==0){?>
+								<th><?=t('BRANCH');?></th>
+								<?php }?>
+							 <th><?=t('PROCESS');?></th>
+                          </tr>
+                        </tfoot>
+                      </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+
+
+
+
+<?php if (Yii::app()->user->checkAccess('routeidentification.update')){ ?>
+<!-- G�NCELLEME BA�LANGI�-->
+	<div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="form-group">
+                           <!-- Modal -->
+            <div class="modal fade text-left" id="duzenle" tabindex="-1" role="dialog" aria-labelledby="myModalLabel8"
+                          aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning white">
+                            <h4 class="modal-title" id="myModalLabel8"><?=t('User Update');?></h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+					<!--form baslang��-->
+						<form id="user-form" action="/route/update/0" method="post">
+                            <div class="modal-body">
+								<input type="hidden" class="form-control" id="modalrouteid" name="Route[id]" value="0">
+								<input type="hidden" class="form-control" id="basicInput" name="Route[firmid]" value="<?=$ax->firmid;?>">
+
+
+						<div class="col-xl-12 col-lg-12 col-md-12 mb-1">
+						<label for="basicSelect"><?=t('Route Name');?></label>
+                        <fieldset class="form-group">
+                          <input type="text" class="form-control" id="modalroutename" placeholder="<?=t('Route Name');?>" name="Route[teamname]">
+                        </fieldset>
+                    </div>
+
+
+
+
+
+					<div class="col-xl-12 col-lg-12 col-md-12 mb-1">
+						<label for="basicSelect"><?=t('Route Client');?></label>
+                        <fieldset class="form-group">
+                          <select class="select2-placeholder-multiple form-control" value="1" id="modalrouteclient" multiple="multiple"  style="width:100%;" name="Route[routeclient][]"  >
+
+									 <?
+								$client=Client::model()->findAll(array('condition'=>'isdelete=0 and parentid=0 and firmid='.$ax->firmid,));
+									foreach($client as $clientx)
+									{?>
+										<optgroup label="<?=$clientx->name;?>">
+												<?$clientbranchs=Client::model()->findAll(array('condition'=>'isdelete=0 and parentid='.$clientx->id));
+													foreach($clientbranchs as $clientbranch)
+													{
+														$transfer=Client::model()->istransfer($clientbranch->id);
+														if(($transfer!=1 || $ax->branchid==0)){?>
+													<option value="<?=$clientbranch->id;?>"><?=$clientx->name;?> - <?=$clientbranch->name;?></option>
+													<?php }}?>
+										</optgroup>
+									<?php }
+								?>
+
+								</optgroup>
+							  </select>
+                        </fieldset>
+                    </div>
+
+
+
+                            </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal"><?=t('Close');?></button>
+                                 <button class="btn btn-warning block-page" type="submit"><?=t('Update');?></button>
+                                </div>
+
+						</form>
+
+									<!--form biti�-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+	<!-- G�NCELLEME B�T��-->
+<?php }?>
+<?php if (Yii::app()->user->checkAccess('routeidentification.delete')){ ?>
+	<!--S�L BA�LANGI�-->
+
+		<div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="form-group">
+                           <!-- Modal -->
+            <div class="modal fade text-left" id="sil" tabindex="-1" role="dialog" aria-labelledby="myModalLabel8"
+                          aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger white">
+                            <h4 class="modal-title" id="myModalLabel8"><?=t('User Delete');?></h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+					<!--form baslang��-->
+						<form id="user-form" action="/route/delete/0" method="post">
+
+						<input type="hidden" class="form-control" id="modalrouteid2" name="Route[id]" value="0">
+
+                            <div class="modal-body">
+
+								<div class="col-xl-12 col-lg-12 col-md-12 mb-1">
+									<h5> <?=t('Do you want to delete?');?></h5>
+								</div>
+
+
+
+                            </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal"><?=t('Close');?></button>
+                                 <button class="btn btn-danger block-page" type="submit"><?=t('Delete');?></button>
+                                </div>
+
+						</form>
+
+									<!--form biti�-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<!-- S�L B�T�� -->
+
+		<!--delelete all start-->
+
+		<div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="form-group">
+                           <!-- Modal -->
+            <div class="modal fade text-left" id="deleteall" tabindex="-1" role="dialog" aria-labelledby="myModalLabel8"
+                          aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger white">
+                            <h4 class="modal-title" id="myModalLabel8"><?=t('Route Delete');?></h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+				<!--form baslang��-->
+						<form action="/route/deleteall" method="post">
+
+						<input type="hidden" class="form-control" id="modalid3" name="Route[id]" value="0">
+
+                            <div class="modal-body">
+
+								<div class="col-xl-12 col-lg-12 col-md-12 mb-1">
+									<h5><?=t('Are you sure you want to delete?');?></h5>
+								</div>
+
+
+
+                            </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn grey btn-outline-secondary " data-dismiss="modal"><?=t('Close');?></button>
+                                 <button class="btn btn-danger block-page" type="submit"><?=t('Delete');?></button>
+                                </div>
+
+						</form>
+
+									<!--form biti�-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<!-- delete all finish -->
+<?php }?>
+<?php }?>
+
+
+
+<style>
+.switchery,.switch{
+margin-left:auto !important;
+margin-right:auto !important;
+}
+</style>
+<script>
+$("#createpage").hide();
+$("#createbutton").click(function(){
+        $("#createpage").toggle(500);
+ });
+ $("#cancel").click(function(){
+        $("#createpage").hide(500);
+ });
+
+
+ //delete all start
+$(document).ready(function(){
+    $('#select_all').on('click',function(){
+        if(this.checked){
+            $('.sec').each(function(){
+                this.checked = true;
+            });
+        }else{
+             $('.sec').each(function(){
+                this.checked = false;
+            });
+        }
+    });
+
+    $('.sec').on('click',function(){
+        if($('.sec:checked').length == $('.sec').length){
+            $('#select_all').prop('checked',true);
+        }else{
+            $('#select_all').prop('checked',false);
+        }
+    });
+});
+
+ function deleteall()
+ {
+	var ids = [];
+	$('.sec:checked').each(function(i, e) {
+		ids.push($(this).val());
+	});
+	$('#modalid3').val(ids);
+	if(ids=='')
+	 {
+		alert("<?=t('You must select at least one of the checboxes!');?>");
+	}
+	else
+	 {
+		$('#deleteall').modal('show');
+	 }
+
+ }
+ // delete all finish
+
+    $(document).ready(function() {
+      $('.block-page').on('click', function() {
+        $.blockUI({
+            message: '<div class="ft-refresh-cw icon-spin font-medium-2"></div>',
+            timeout: 20000, //unblock after 20 seconds
+            overlayCSS: {
+                backgroundColor: '#FFF',
+                opacity: 0.8,
+                cursor: 'wait'
+            },
+            css: {
+                border: 0,
+                padding: 0,
+                backgroundColor: 'transparent'
+            }
+        });
+    });
+
+});
+
+
+
+function myfirm()
+{
+  $.post( "/workorder/firmbranch?id="+document.getElementById("firm").value).done(function( data ) {
+		$( "#branch" ).prop( "disabled", false );
+		$('#branch').html(data);
+		//$("#"+$(obj).data('id')+"x").css("background-color", "yellow");
+
+	});
+}
+
+function mybranch()
+{
+  $.post( "/route/clientroute?id="+document.getElementById("branch").value).done(function( data ) {
+		$( "#route" ).prop( "disabled", false );
+		$('#route').html(data);
+		//$("#"+$(obj).data('id')+"x").css("background-color", "yellow");
+
+	});
+}
+<?php if($ax->branchid!=0){?>
+
+	$.post( "/workorder/client?id="+document.getElementById("branch").value).done(function( data ) {
+			$( "#route" ).prop( "disabled", false );
+			$('#route').html(data);
+		});
+
+
+<?php }?>
+
+<?php if($ax->firmid!=0){?>
+	$.post( "/workorder/firmbranch?id="+document.getElementById("firm").value).done(function( data ) {
+		$( "#branch" ).prop( "disabled", false );
+		$('#branch').html(data);
+		//$("#"+$(obj).data('id')+"x").css("background-color", "yellow");
+
+	});
+<?php }?>
+
+function openmodal(obj)
+{
+	$('#modalrouteid').val($(obj).data('id'));
+
+
+	$.post( "/workorder/client?id="+$(obj).data('branchid')).done(function( data ) {
+
+			$('#modalrouteclient').html(data);
+			$('#modalrouteclient').val($(obj).data('routeclient').split(','));
+			$('#modalrouteclient').select2('destroy');
+			$('#modalrouteclient').select2({
+				closeOnSelect: false,
+					 allowClear: true
+			});
+		});
+
+
+	$('#modalroutename').val($(obj).data('name'));
+
+	$('#duzenle').modal('show');
+
+}
+
+
+
+function openmodalsil(obj)
+{
+	$('#modalrouteid2').val($(obj).data('id'));
+	$('#sil').modal('show');
+
+}
+
+
+
+
+
+$(document).ready(function() {
+
+$('.select2-placeholder-multiple').select2({
+    closeOnSelect: false,
+	allowClear: true,
+	multiple:true,
+});
+
+
+/******************************************
+*       js of HTML5 export buttons        *
+******************************************/
+
+$('.dataex-html5-export').DataTable( {
+    dom: 'Bfrtip',
+		lengthMenu: [[5,10,50,100, -1], [5,10,50,100, "<?=t('All');?>"]],
+	    language: {
+        buttons: {
+            pageLength: {
+                _: "<?=t('Show');?> %d <?=t('rows');?>",
+                '-1': "<?=t('Tout afficher');?>",
+				className: 'd-none d-sm-none d-md-block',
+            },
+			colvis: "<?=t('Columns Visibility');?>",
+
+        },
+				     "sDecimal": ",",
+                     "sEmptyTable": "<?=t('Data is not available in the table');?>",
+                     //"sInfo": "_TOTAL_ kay�ttan _START_ - _END_ aras�ndaki kay�tlar g�steriliyor",
+                     "sInfo": "<?=t('Total number of records');?> : _TOTAL_",
+                     "sInfoEmpty": "<?=t('No records found');?> ! ",
+                     "sInfoFiltered": "(_MAX_ <?=t('records');?>)",
+                     "sInfoPostFix": "",
+                     "sInfoThousands": ".",
+                     "sLengthMenu": "<?=t('Top of page');?> _MENU_ <?=t('record');?>",
+                     "sLoadingRecords": "<?=t('Loading');?>...",
+                     "sProcessing": "<?=t('Processing');?>...",
+                     "sSearch": "<?=t('Search');?>:",
+                     "sZeroRecords": "<?=t('No records found');?> !",
+                     "oPaginate": {
+                         "sFirst": "<?=t('First page');?>",
+                         "sLast": "<?=t('Last page');?>",
+                         "sNext": "<?=t('Next');?>",
+                         "sPrevious": "<?=t('Previous');?>"
+                     },
+    },
+ buttons: [
+        {
+            extend: 'copyHtml5',
+          exportOptions: {
+                 columns: [0,1,2]
+            },
+			text:'<?=t('Copy');?>',
+			className: 'd-none d-sm-none d-md-block',
+			title:'Client Route Identifications (<?=date("d-m-Y H:i:s");?>)\n',
+        },
+        {
+            extend: 'excelHtml5',
+            exportOptions: {
+                 columns: [0,1,2]
+            },
+			text:'<?=t('Excel');?>',
+			className: 'd-none d-sm-none d-md-block',
+			title:'Client Route Identifications (<?=date("d-m-Y H:i:s");?>)\n',
+        },
+
+
+
+		{
+             extend: 'pdfHtml5',
+			 exportOptions: {
+                columns: [ 0,1,2]
+            },
+					text:'<?=t('PDF');?>',
+			  //message: "Made: 20_05-17\nMade by whom: User232\n" + "Custom message",
+			  title: 'Client Route Identifications',
+			  header: true,
+			  customize: function(doc) {
+				doc.content.splice(0, 1, {
+				  text: [{
+					text: 'Route Identifications \n',
+					bold: true,
+					fontSize: 16,
+						alignment: 'center'
+				  },
+
+					{
+					text: '<?=date('d-m-Y H:i:s');?>',
+					bold: true,
+					fontSize: 10,
+					alignment: 'center'
+				  }],
+				  margin: [0, 0, 0, 12]
+
+				});
+			  }
+
+        },
+
+        'colvis',
+		'pageLength'
+    ]
+
+
+} );
+<?
+$ax= User::model()->userobjecty('');
+$pageUrl=explode('?',$_SERVER['REQUEST_URI'])[0];
+$pageLength=5;
+$table=Usertablecontrol::model()->find(array(
+							 'condition'=>'userid=:userid and sayfaname=:sayfaname',
+							 'params'=>array(
+								 'userid'=>$ax->id,
+								 'sayfaname'=>$pageUrl)
+						 ));
+if($table){
+	$pageLength=$table->value;
+}
+?>
+var table = $('.dataex-html5-export').DataTable();
+table.page.len( <?=$pageLength;?> ).draw();
+var table = $('.dataex-html5-export').DataTable(); //note that you probably already have this call
+var info = table.page.info();
+var lengthMenuSetting = info.length; //The value you want
+// alert(table.page.info().length);
+} );
+
+</script>
+
+
+<style>
+@media (max-width: 991.98px) {
+
+.hidden-xs,.buttons-collection{
+display:none;
+}
+ div.dataTables_wrapper div.dataTables_filter label{
+ white-space: normal !important;
+ }
+div.dataTables_wrapper div.dataTables_filter input{
+margin-left:0px !important;
+}
+
+ }
+</style>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+<?php
+Yii::app()->params['scripts'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/js/forms/toggle/bootstrap-checkbox.min.js;';
+Yii::app()->params['scripts'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/js/forms/toggle/switchery.min.js;';
+Yii::app()->params['scripts'].=Yii::app()->theme->baseUrl.'/app-assets/js/scripts/forms/switch.js;';
+
+Yii::app()->params['scripts'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/js/forms/select/select2.full.min.js;';
+Yii::app()->params['scripts'].=Yii::app()->theme->baseUrl.'/app-assets/js/scripts/forms/select/form-select2.js;';
+
+
+Yii::app()->params['scripts'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/js/forms/select/select2.full.min.js;';
+//Yii::app()->params['scripts'].=Yii::app()->theme->baseUrl.'/app-assets/js/scripts/forms/select/form-select2.js;';
+
+
+
+
+Yii::app()->params['scripts'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/js/tables/datatable/datatables.min.js;';
+Yii::app()->params['scripts'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/js/tables/datatable/dataTables.buttons.min.js;';
+Yii::app()->params['scripts'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/js/tables/datatable/buttons.bootstrap4.min.js;';
+
+Yii::app()->params['css'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/css/forms/selects/select2.min.css;';
+
+
+Yii::app()->params['css'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/css/forms/toggle/switchery.min.css;';
+
+Yii::app()->params['css'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/css/tables/datatable/datatables.min.css;';
+Yii::app()->params['css'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/css/tables/extensions/buttons.dataTables.min.css;';
+Yii::app()->params['css'].=Yii::app()->theme->baseUrl.'/app-assets/vendors/css/tables/datatable/buttons.bootstrap4.min.css;';?>

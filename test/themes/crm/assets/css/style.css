@@ -1,0 +1,117 @@
+.li_style{
+    padding:10px 18px 10px 18px;
+    background: #cfe7e8;
+    border-right: 1px solid #aec4c5;
+}
+.active{background: #c4d7dc;}
+.first{
+        background: #ffffff;
+        padding: 4px 10px 4px 10px;
+        font-size: 15px;
+        border-left: 1px solid #ffffff;
+        border-radius: 7px 0 0 7px;
+        font-weight: 700;
+}
+.page{
+        background: #dedede;
+    padding: 4px 10px 4px 10px;
+    font-size: 15px;
+    border-left: 1px solid #bfbebe;
+        font-weight: 700;
+}
+.last{
+        background: #ffffff;
+        padding: 4px 10px 4px 10px;
+        font-size: 15px;
+        border-left: 1px solid #ffffff;
+        border-right: 1px solid #ffffff;
+        border-radius: 0 7px 7px 0;
+        font-weight: 700;
+}
+.calendar{
+        top: 10px;
+    line-height: 3;
+    /* padding: 2px; */
+    padding-left: 5px;
+    padding-right: 5px;
+    background: #eceff1;
+    border: solid 1px #ccd6e6;
+}
+
+.baslik_h1{
+        border-top: 1px solid #eceeef;
+    border-bottom: 1px solid #eceeef;
+    padding: 11px 0 2px 13px;
+}
+
+
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+.userview{
+	padding-top: 15px;
+    padding-bottom: 15px;
+    border: 1px solid #f3f3f3;
+    box-shadow: 3px 3px 4px #000;
+    -moz-box-shadow: 3px 3px 4px #000;
+    -webkit-box-shadow: 1px 1px 2px #000;
+}
+
+
+.btn-effect{padding: 0px 6px 0 6px;border: 1px solid #62769a;margin-right: 9px;border-radius: 100%;background: #63779c;color: #fff;}
+.btn-effect2{padding: 0px 9px 0 9px;border: 1px solid #62769a;margin-right: 9px;border-radius: 100%;background: #63779c;color: #fff;}

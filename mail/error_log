@@ -1,0 +1,6 @@
+[19-Sep-2018 13:09:18 Etc/GMT] PHP Fatal error:  Cannot redeclare PHPMailerAutoload() (previously declared in /home/ioinsectram/public_html/mail/classlar/PHPMailerAutoload.php:24) in /home/ioinsectram/public_html/mail/classlar/PHPMailerAutoload.php on line 31
+[19-Sep-2018 13:09:38 Etc/GMT] PHP Fatal error:  Cannot redeclare PHPMailerAutoload() (previously declared in /home/ioinsectram/public_html/mail/classlar/PHPMailerAutoload.php:24) in /home/ioinsectram/public_html/mail/classlar/PHPMailerAutoload.php on line 31
+[19-Sep-2018 13:09:39 Etc/GMT] PHP Fatal error:  Cannot redeclare PHPMailerAutoload() (previously declared in /home/ioinsectram/public_html/mail/classlar/PHPMailerAutoload.php:24) in /home/ioinsectram/public_html/mail/classlar/PHPMailerAutoload.php on line 31
+[19-Sep-2018 13:10:32 Etc/GMT] PHP Fatal error:  Cannot redeclare PHPMailerAutoload() (previously declared in /home/ioinsectram/public_html/mail/classlar/PHPMailerAutoload.php:24) in /home/ioinsectram/public_html/mail/classlar/PHPMailerAutoload.php on line 31
+[19-Sep-2018 13:25:27 Etc/GMT] PHP Notice:  Undefined variable: e in /home/ioinsectram/public_html/mail/iletisimgonder.php on line 94
+[19-Sep-2018 13:25:27 Etc/GMT] PHP Notice:  Undefined variable: n in /home/ioinsectram/public_html/mail/iletisimgonder.php on line 94
