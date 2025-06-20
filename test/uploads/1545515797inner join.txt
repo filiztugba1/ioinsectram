@@ -1,0 +1,5 @@
+SELECT staffteamlist.*,user.name, user.surname FROM staffteamlist LEFT JOIN user ON staffteamlist.userid = user.id
+
+
+SELECT staffteamlist.*,user.name, user.surname, COUNT(*) as aaaa FROM staffteamlist LEFT JOIN user ON staffteamlist.userid = user.id group by name order by aaaa desc
+

@@ -1,0 +1,3 @@
+---->HASH = CPasswordHelper::hashPassword($password[0]);
+
+---->modultanýmlama = Yii::app()->getModule('authsystem');

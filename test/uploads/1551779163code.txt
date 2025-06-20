@@ -1,0 +1,79 @@
+//html
+	<div class="form-group pb-1">
+		<input type="checkbox" id="checkbox" data-size="sm"  class="switchery" data-id="<?=$firms->id;?>"  <?php if($firms->active==1){echo "checked";}?>  <?php if (Yii::app()->user->checkAccess('firm.update')==0){?>disabled<?php }?> />
+	</div>	
+
+
+
+
+//ajax checkbox 
+//script
+
+function authchange2(data,permission,obj)
+{
+$.post( "?", { firmid: data, active: permission })
+  .done(function( returns ) {
+	 toastr.success(result2,"<center>Success</center>" , {
+				positionClass: "toast-bottom-right",
+				containerId: "toast-top-right"
+		});
+});	
+};
+
+$(document).ready(function(){
+	$("#checkbox").on('change', function() {
+		
+	  if ($(this).is(':checked')) {
+		  authchange2($(this).data("id"),1,$(this));
+	  } else {
+		  authchange2($(this).data("id"),0,$(this));
+	  }
+	  
+	  $('#checkbox-value').text($('#checkbox1').val());
+});
+});
+
+
+
+//actionIndex -->controller
+
+	if (isset($_POST['firmid']))
+		{			
+			$guncelle=Firm::model()->changeactive($_POST['firmid'],$_POST['active']);
+			if(!$guncelle){
+				echo "hata";
+			}
+			else{
+				echo "kaydedildi";
+			}
+		
+		}
+
+//changeactive() --> model
+
+	public function changeactive($id,$isactive)
+	{
+		$firm=Firm::model()->find(array('condition'=>'id=:id','params'=>array('id'=>$id)));
+		if($firm)
+		{
+			$firm->active=$isactive;
+			if(!$firm->update())
+			{
+				print_r($firm->getErrors());
+			}
+			else{
+				return true;
+			}		
+		}
+		else
+		{
+			echo "bulamad�m";exit;
+		}
+	}
+
+
+
+
+--------------------->user bilgileri
+$ax->id;
+$ax= User::model()->userobjecty('');

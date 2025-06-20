@@ -1,0 +1,61 @@
+<?
+class Uyeler extends Controller
+{
+    public function index()
+    {
+        $userModel=$this->model('firm');
+        $users=$userModel->getAll();
+        
+       
+        $this->view('uyeler',[
+            'userss'=>$users
+        ]);
+    }
+
+    public function detay($id)
+    {
+        $userModel=$this->model('users');
+        $users=$userModel->detay($id);
+       
+        $this->view('uyeler',[
+            'userss'=>$users
+        ]);
+    }
+
+    public function create()
+    {
+        $userModel=$this->model('users');
+        $userModel->create($_POST);
+        $users=$userModel->getAll();
+       
+        $this->view('uyeler',[
+            'userss'=>$users
+        ]);
+    }
+
+    public function update($id)
+    {
+     
+        $userModel=$this->model('users');
+        $userModel->update($_POST,$id);
+        $users=$userModel->getAll();
+     
+        $this->view('uyeler',[
+            'userss'=>$users
+        ]);
+    }
+
+    public function delete($id)
+    {
+     
+        $userModel=$this->model('users');
+        $userModel->delete($id);
+        $users=$userModel->getAll();
+     
+        $this->view('uyeler',[
+            'userss'=>$users
+        ]);
+    }
+}
+
+?>

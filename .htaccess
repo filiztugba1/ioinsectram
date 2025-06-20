@@ -1,0 +1,32 @@
+php_value memory_limit 2048M
+php_value max_execution_time 300
+php_value post_max_size 256M
+php_value upload_max_filesize 256M
+php_value max_input_time 300
+
+RewriteEngine on
+
+# if a directory or a file exists, use it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# otherwise forward it to index.php
+RewriteRule . index.php
+
+# Prevent directory listing
+Options -Indexes
+
+# Prevent access to .htaccess
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Prevent access to files with extensions .ini, .psd, .log, .sh
+<FilesMatch "\.(?i:ini|psd|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Prevent access to folders starting with dot
+RewriteRule "(^|/)\." - [F] 
